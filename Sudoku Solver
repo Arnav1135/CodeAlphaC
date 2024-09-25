@@ -1,0 +1,61 @@
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <algorithm>
+
+// A simple structure to represent the chatbot
+class Chatbot {
+public:
+    void start() {
+        std::cout << "Chatbot: Hi! How can I assist you today?\n";
+        while (true) {
+            std::string input;
+            std::getline(std::cin, input);
+            if (input == "exit") {
+                std::cout << "Chatbot: Goodbye!\n";
+                break;
+            }
+            processInput(input);
+        }
+    }
+
+private:
+    void processInput(const std::string& input) {
+        std::string normalizedInput = normalize(input);
+        if (isGreeting(normalizedInput)) {
+            std::cout << "Chatbot: Hello! How can I help you?\n";
+        } else if (containsKeywords(normalizedInput, {"weather", "rain", "sunny"})) {
+            std::cout << "Chatbot: The weather is great today!\n";
+        } else if (containsKeywords(normalizedInput, {"help", "assist"})) {
+            std::cout << "Chatbot: Sure! What do you need help with?\n";
+        } else {
+            std::cout << "Chatbot: I'm not sure how to respond to that.\n";
+        }
+    }
+
+    std::string normalize(const std::string& input) {
+        std::string normalized = input;
+        std::transform(normalized.begin(), normalized.end(), normalized.begin(), ::tolower);
+        return normalized;
+    }
+
+    bool isGreeting(const std::string& input) {
+        return input.find("hello") != std::string::npos || input.find("hi") != std::string::npos;
+    }
+
+    bool containsKeywords(const std::string& input, const std::vector<std::string>& keywords) {
+        for (const auto& keyword : keywords) {
+            if (input.find(keyword) != std::string::npos) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+int main() {
+    Chatbot chatbot;
+    chatbot.start();
+    return 0;
+}
