@@ -1,61 +1,94 @@
 #include <iostream>
-#include <string>
-#include <unordered_map>
 #include <vector>
-#include <algorithm>
 
-// A simple structure to represent the chatbot
-class Chatbot {
-public:
-    void start() {
-        std::cout << "Chatbot: Hi! How can I assist you today?\n";
-        while (true) {
-            std::string input;
-            std::getline(std::cin, input);
-            if (input == "exit") {
-                std::cout << "Chatbot: Goodbye!\n";
-                break;
-            }
-            processInput(input);
+using namespace std;
+
+
+void printBoard(const vector<vector<int>>& board) {
+    for (int row = 0; row < 9; row++) {
+        for (int col = 0; col < 9; col++) {
+            cout << board[row][col] << " ";
+        }
+        cout << endl;
+    }
+}
+
+
+bool isValid(const vector<vector<int>>& board, int num, int row, int col) {
+    
+    for (int i = 0; i < 9; i++) {
+        if (board[row][i] == num) return false;
+    }
+
+ 
+    for (int i = 0; i < 9; i++) {
+        if (board[i][col] == num) return false;
+    }
+
+    
+    int startRow = row - row % 3;
+    int startCol = col - col % 3;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (board[startRow + i][startCol + j] == num) return false;
         }
     }
 
-private:
-    void processInput(const std::string& input) {
-        std::string normalizedInput = normalize(input);
-        if (isGreeting(normalizedInput)) {
-            std::cout << "Chatbot: Hello! How can I help you?\n";
-        } else if (containsKeywords(normalizedInput, {"weather", "rain", "sunny"})) {
-            std::cout << "Chatbot: The weather is great today!\n";
-        } else if (containsKeywords(normalizedInput, {"help", "assist"})) {
-            std::cout << "Chatbot: Sure! What do you need help with?\n";
-        } else {
-            std::cout << "Chatbot: I'm not sure how to respond to that.\n";
+    return true;
+}
+
+
+bool findEmpty(const vector<vector<int>>& board, int& row, int& col) {
+    for (row = 0; row < 9; row++) {
+        for (col = 0; col < 9; col++) {
+            if (board[row][col] == 0) return true; 
+        }
+    }
+    return false; 
+}
+
+
+bool solveSudoku(vector<vector<int>>& board) {
+    int row, col;
+    
+    
+    if (!findEmpty(board, row, col)) return true;
+
+   
+    for (int num = 1; num <= 9; num++) {
+        if (isValid(board, num, row, col)) {
+            board[row][col] = num; 
+            if (solveSudoku(board)) return true;
+
+            
+            board[row][col] = 0;
         }
     }
 
-    std::string normalize(const std::string& input) {
-        std::string normalized = input;
-        std::transform(normalized.begin(), normalized.end(), normalized.begin(), ::tolower);
-        return normalized;
-    }
-
-    bool isGreeting(const std::string& input) {
-        return input.find("hello") != std::string::npos || input.find("hi") != std::string::npos;
-    }
-
-    bool containsKeywords(const std::string& input, const std::vector<std::string>& keywords) {
-        for (const auto& keyword : keywords) {
-            if (input.find(keyword) != std::string::npos) {
-                return true;
-            }
-        }
-        return false;
-    }
-};
+    return false; 
+}
 
 int main() {
-    Chatbot chatbot;
-    chatbot.start();
+    
+    vector<vector<int>> board = {
+        {5, 3, 0, 0, 7, 0, 0, 0, 0},
+        {6, 0, 0, 1, 9, 5, 0, 0, 0},
+        {0, 9, 8, 0, 0, 0, 0, 6, 0},
+        {8, 0, 0, 0, 6, 0, 0, 0, 3},
+        {4, 0, 0, 8, 0, 3, 0, 0, 1},
+        {7, 0, 0, 0, 2, 0, 0, 0, 6},
+        {0, 6, 0, 0, 0, 0, 2, 8, 0},
+        {0, 0, 0, 4, 1, 9, 0, 0, 5},
+        {0, 0, 0, 0, 8, 0, 0, 7, 9}
+    };
+
+    
+    if (solveSudoku(board)) {
+        cout << "Solved Sudoku board:" << endl;
+        printBoard(board);
+    } else {
+        cout << "No solution exists!" << endl;
+    }
+
     return 0;
 }
